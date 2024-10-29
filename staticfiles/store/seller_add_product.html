@@ -1,0 +1,125 @@
+{% extends 'store/seller_base.html' %}
+{% load form_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="card-title text-left mb-4">{% if product %}Edit Product - {{ product.name }}{% else %}Add Product{% endif %}</h2>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- First Row: Product Name and Price -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="name" class="form-label">Product Name</label>
+                        {{ form.name|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="price" class="form-label">Price</label>
+                        {{ form.price|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <!-- Second Row: Category and SKU -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        {{ form.category|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="sku" class="form-label">SKU</label>
+                        {{ form.sku|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <!-- Third Row: Stock and Discount -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="stock" class="form-label">Stock Quantity</label>
+                        {{ form.stock|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="discount" class="form-label">Discount</label>
+                        {{ form.discount|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <!-- Fourth Row: Weight and Dimensions -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="weight" class="form-label">Weight</label>
+                        {{ form.weight|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="dimensions" class="form-label">Dimensions</label>
+                        {{ form.dimensions|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <!-- Fifth Row: Shipping Charge and Tax Percentage -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="shipping_charge" class="form-label">Shipping Charge</label>
+                        {{ form.shipping_charge|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="tax_percentage" class="form-label">Tax Percentage</label>
+                        {{ form.tax_percentage|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <!-- Sixth Row: Offer -->
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="offer" class="form-label">Offer</label>
+                        {{ form.offer|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <!-- Seventh Row: Description (Text Area) -->
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        {{ form.description|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <!-- Eighth Row: Thumbnail and Main Product Image -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="thumbnail" class="form-label">Thumbnail Image</label>
+                        {{ form.thumbnail|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="image" class="form-label">Main Product Image</label>
+                        {{ form.image|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <!-- Ninth Row: Additional Images -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="image1" class="form-label">Additional Image 1</label>
+                        {{ form.image1|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="image2" class="form-label">Additional Image 2</label>
+                        {{ form.image2|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="image3" class="form-label">Additional Image 3</label>
+                        {{ form.image3|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-info btn-block mt-3">
+                    {% if product %}Update{% else %}Add{% endif %} Product
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Products in {{ category.name }}{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Products in {{ category.name }}</h1>
+    <div class="row">
+        {% for product in products %}
+        <div class="col-lg-3 mb-4">
+            <div class="product-card card border-0 shadow-lg">
+                <div class="product-image position-relative overflow-hidden">
+                    <a href="{% url 'product_detail' product.id %}">
+                        <img src="{{ product.thumbnail.url }}" alt="{{ product.name }}" class="card-img-top transition-scale">
+                    </a>
+                    <div class="product-actions position-absolute top-0 end-0 m-3">
+                        <a class="btn btn-primary btn-sm" href="{% url 'add_to_cart' product.id %}">
+                            <i class="fas fa-shopping-cart"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="product-title">
+                        <a href="{% url 'product_detail' product.id %}">{{ product.name }}</a>
+                    </div>
+                    <div class="product-price d-flex justify-content-between align-items-center">
+                        <h5 class="text-primary mb-0"><span>$</span>{{ product.discount_price }}</h5>
+                        <small class="text-muted"><del>${{ product.price }}</del></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

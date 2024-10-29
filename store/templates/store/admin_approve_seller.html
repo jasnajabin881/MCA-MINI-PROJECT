@@ -1,0 +1,53 @@
+{% extends 'store/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Approve Seller</h2>
+    <p>Below are the details of the seller you are about to approve:</p>
+
+    <table class="table table-bordered">
+        <tr>
+            <th>Email</th>
+            <td>{{ seller.email }}</td>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <td>{{ seller.seller_profile.name }}</td>
+        </tr>
+        <tr>
+            <th>Business Name</th>
+            <td>{{ seller.seller_profile.business_name }}</td>
+        </tr>
+        <tr>
+            <th>Tax Information</th>
+            <td>{{ seller.seller_profile.tax_info }}</td>
+        </tr>
+        <tr>
+            <th>Location</th>
+            <td>{{ seller.seller_profile.location }}</td>
+        </tr>
+        <tr>
+            <th>Address</th>
+            <td>{{ seller.seller_profile.address }}</td>
+        </tr>
+        <tr>
+            <th>Is Active</th>
+            <td>
+                {% if seller.is_active %}
+                    Yes
+                {% else %}
+                    No
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <p>Are you sure you want to approve this seller?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Yes, Approve</button>
+        <a href="{% url 'admin_sellers' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

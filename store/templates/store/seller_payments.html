@@ -1,0 +1,176 @@
+{% extends 'store/seller_base.html' %}
+{% block title %}Payments{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+  <div class="page-header">
+    <h3 class="page-title">Payments Summary</h3>
+  </div>
+
+  <div class="row">
+    <div class="col-xl-4 col-sm-6 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Total Sales</h5>
+          <h3 class="mb-0">₹{{ total_sales|floatformat:2 }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-sm-6 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Total Tax</h5>
+          <h3 class="mb-0">₹{{ total_tax|floatformat:2 }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-sm-6 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Total Shipping</h5>
+          <h3 class="mb-0">₹{{ total_shipping|floatformat:2 }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-sm-6 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Total Commission</h5>
+          <h3 class="mb-0">₹{{ total_commission|floatformat:2 }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-sm-6 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Net Earnings</h5>
+          <h3 class="mb-0">₹{{ net_earnings|floatformat:2 }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Payment Details</h4>
+          <form method="post">
+            {% csrf_token %}
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th><input type="checkbox" id="select-all"> Select All</th>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <th>Product Total</th>
+                    <th>Tax</th>
+                    <th>Shipping</th>
+                    <th>Commission</th>
+                    <th>Net Earnings</th>
+                    <th>Settlement Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for order in orders %}
+                  <tr>
+                    <td>
+                      <input type="checkbox" name="selected_orders" value="{{ order.id }}"
+                        {% if order.settlement_request_status == 'requested' or order.settlement_request_status == 'approved' %}disabled{% endif %}>
+                    </td>
+                    <td>#{{ order.id }}</td>
+                    <td>{{ order.created_at|date:"F d, Y H:i" }}</td>
+                    <td>₹{{ order.total_product_price|floatformat:2 }}</td>
+                    <td>₹{{ order.total_tax|floatformat:2 }}</td>
+                    <td>₹{{ order.total_shipping|floatformat:2 }}</td>
+                    <td>₹{{ order.total_commission|floatformat:2 }}</td>
+                    <td>₹{{ order.net_earnings|floatformat:2 }}</td>
+                    <td>
+                      {% if order.settlement_request_status == 'requested' %}
+                        <span class="badge badge-warning">Requested</span>
+                      {% elif order.settlement_request_status == 'approved' %}
+                        <span class="badge badge-success">Approved</span>
+                      {% elif order.settlement_request_status == 'rejected' %}
+                        <span class="badge badge-danger">Rejected</span>
+                      {% else %}
+                        <span class="badge badge-secondary">Not Requested</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <a href="{% url 'seller_order_detail' order.id %}" class="btn btn-primary btn-sm">View Details</a>
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="10">No payments found.</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3" name="request_settlement">Request Settlement for Selected Orders</button>
+          </form>
+          {% if orders.has_other_pages %}
+          <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+              {% if orders.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ orders.previous_page_number }}">Previous</a></li>
+              {% endif %}
+
+              <li class="page-item disabled"><a class="page-link" href="#">Page {{ orders.number }} of {{ orders.paginator.num_pages }}</a></li>
+
+              {% if orders.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ orders.next_page_number }}">Next</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ orders.paginator.num_pages }}">Last &raquo;</a></li>
+              {% endif %}
+            </ul>
+          </nav>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Select all checkboxes
+  var selectAll = document.getElementById('select-all');
+  var checkboxes = document.querySelectorAll('input[name="selected_orders"]');
+
+  selectAll.addEventListener('change', function() {
+    for (var i = 0; i < checkboxes.length; i++) {
+      if (!checkboxes[i].disabled) {
+        checkboxes[i].checked = this.checked;
+      }
+    }
+  });
+
+  // Update "Select All" checkbox state
+  function updateSelectAllCheckbox() {
+    var allChecked = true;
+    var allDisabled = true;
+    for (var i = 0; i < checkboxes.length; i++) {
+      if (!checkboxes[i].disabled) {
+        allDisabled = false;
+        if (!checkboxes[i].checked) {
+          allChecked = false;
+          break;
+        }
+      }
+    }
+    selectAll.checked = allChecked && !allDisabled;
+    selectAll.disabled = allDisabled;
+  }
+
+  // Add event listeners to individual checkboxes
+  for (var i = 0; i < checkboxes.length; i++) {
+    checkboxes[i].addEventListener('change', updateSelectAllCheckbox);
+  }
+
+  // Initial update of "Select All" checkbox
+  updateSelectAllCheckbox();
+</script>
+{% endblock %}

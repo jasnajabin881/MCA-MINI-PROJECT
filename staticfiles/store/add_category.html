@@ -1,0 +1,54 @@
+{% extends 'store/base.html' %}
+{% load form_tags %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Add Category</h2>
+
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_name">Category Name</label>
+            {{ form.name|add_class:"form-control" }}  <!-- Adding Bootstrap styling -->
+            {% if form.name.errors %}
+                <div class="invalid-feedback">
+                    {{ form.name.errors|striptags }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_description">Description</label>
+            {{ form.description|add_class:"form-control" }}
+            {% if form.description.errors %}
+                <div class="invalid-feedback">
+                    {{ form.description.errors|striptags }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_commission">Commission (%)</label>
+            {{ form.commission|add_class:"form-control" }}
+            {% if form.commission.errors %}
+                <div class="invalid-feedback">
+                    {{ form.commission.errors|striptags }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group form-check">
+            {{ form.status|add_class:"form-check-input" }}
+            <label class="form-check-label" for="id_status">Active</label>
+            {% if form.status.errors %}
+                <div class="invalid-feedback">
+                    {{ form.status.errors|striptags }}
+                </div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add Category</button>
+    </form>
+</div>
+
+{% endblock %}

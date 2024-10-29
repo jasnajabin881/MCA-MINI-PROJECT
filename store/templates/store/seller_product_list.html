@@ -1,0 +1,136 @@
+{% extends 'store/seller_base.html' %}
+
+{% block extra_css %}
+<style>
+  .product-table th {
+    background-color: #f8f9fa;
+  }
+  .product-table td {
+    vertical-align: middle;
+  }
+  .search-bar {
+    max-width: 300px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+  <div class="page-header">
+    <h3 class="page-title">
+      <span class="page-title-icon bg-gradient-primary text-white mr-2">
+        <i class="mdi mdi-format-list-bulleted"></i>
+      </span>
+      Product List
+    </h3>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">List</li>
+      </ol>
+    </nav>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="card-title mb-0">Products</h4>
+            <a href="{% url 'add_product' %}" class="btn btn-primary btn-icon-text">
+              <i class="mdi mdi-plus btn-icon-prepend"></i>
+              Add Product
+            </a>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <form class="search-bar" method="get">
+                <div class="input-group">
+                  <input type="text" class="form-control" placeholder="Search products..." name="search" value="{{ search_query }}">
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="submit">
+                      <i class="mdi mdi-magnify"></i>
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover product-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for product in products %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ product.name }}</td>
+                  <td>₹{{ product.price }}</td>
+                  <td>
+                    <span class="badge {% if product.stock > 10 %}badge-success{% elif product.stock > 0 %}badge-warning{% else %}badge-danger{% endif %}">
+                      {{ product.stock }}
+                    </span>
+                  </td>
+                  <td>
+                    <a href="{% url 'edit_product' product.id %}" class="btn btn-outline-primary btn-sm">
+                      <i class="mdi mdi-pencil"></i> Edit
+                    </a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center">No products found.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          {% if products.has_other_pages %}
+          <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+              {% if products.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ products.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Previous</a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+              {% endif %}
+
+              {% for i in products.paginator.page_range %}
+                {% if products.number == i %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
+                  </li>
+                {% else %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ i }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+
+              {% if products.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ products.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Next</a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link">Next</span></li>
+              {% endif %}
+            </ul>
+          </nav>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

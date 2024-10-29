@@ -1,0 +1,158 @@
+{% extends 'store/seller_base.html' %}
+
+{% block title %}Seller Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+    .card-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="page-header">
+        <h3 class="page-title">
+            <span class="page-title-icon bg-gradient-primary text-white mr-2">
+                <i class="mdi mdi-home"></i>
+            </span>
+            Seller Dashboard
+        </h3>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 stretch-card grid-margin">
+            <div class="card bg-gradient-info text-white dashboard-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="font-weight-normal mb-3">Total Orders</h4>
+                            <h2 class="mb-5">{{ total_orders }}</h2>
+                            <a href="{% url 'seller_orders' %}" class="text-white">View Details</a>
+                        </div>
+                        <div class="card-icon">
+                            <i class="mdi mdi-cart-outline"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 stretch-card grid-margin">
+            <div class="card bg-gradient-success text-white dashboard-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="font-weight-normal mb-3">Total Products</h4>
+                            <h2 class="mb-5">{{ total_products }}</h2>
+                            <a href="{% url 'list_products' %}" class="text-white">View Details</a>
+                        </div>
+                        <div class="card-icon">
+                            <i class="mdi mdi-package-variant-closed"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 stretch-card grid-margin">
+            <div class="card bg-gradient-danger text-white dashboard-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="font-weight-normal mb-3">Total Revenue</h4>
+                            <h2 class="mb-5">₹{{ total_revenue }}</h2>
+                            <a href="{% url 'seller_payments' %}" class="text-white">View Details</a>
+                        </div>
+                        <div class="card-icon">
+                            <i class="mdi mdi-currency-inr"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 grid-margin stretch-card">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h4 class="card-title">Recent Orders</h4>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                <tr>
+                                    <td>{{ order.id }}</td>
+                                    <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                    <td>₹{{ order.total_price }}</td>
+                                    <td>
+                                        <span class="badge badge-{{ order.status|lower }}">
+                                            {% if order.is_paid %}Paid{% else %}Pending{% endif %}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No recent orders found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 grid-margin stretch-card">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h4 class="card-title">Settlement Requests</h4>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Request ID</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for request in settlement_requests %}
+                                <tr>
+                                    <td>{{ request.id }}</td>
+                                    <td>{{ request.requested_at|date:"M d, Y" }}</td>
+                                    <td>₹{{ request.net_earnings }}</td>
+                                    <td><span class="badge badge-{{ request.status|lower }}">{{ request.status }}</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No settlement requests found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

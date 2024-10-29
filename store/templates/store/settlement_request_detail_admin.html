@@ -1,0 +1,119 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Settlement Request #{{ settlement_request.id }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: none;
+        padding: 20px;
+    }
+    .badge {
+        padding: 8px 12px;
+        border-radius: 30px;
+    }
+    .badge-pending {
+        background-color: #ffc107;
+        color: #000;
+    }
+    .badge-approved {
+        background-color: #28a745;
+        color: #fff;
+        font-weight: bold;
+    }
+    .badge-rejected {
+        background-color: #dc3545;
+        color: #fff;
+    }
+    .detail-row {
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">Settlement Request #{{ settlement_request.id }}</h2>
+            <span class="badge badge-{{ settlement_request.status }}">
+                {{ settlement_request.get_status_display }}
+            </span>
+        </div>
+        <div class="card-body">
+            <div class="row detail-row">
+                <div class="col-md-3 font-weight-bold">Seller:</div>
+                <div class="col-md-9">{{ settlement_request.seller.email }}</div>
+            </div>
+            <div class="row detail-row">
+                <div class="col-md-3 font-weight-bold">Total Sales:</div>
+                <div class="col-md-9">₹{{ settlement_request.total_sales }}</div>
+            </div>
+            <div class="row detail-row">
+                <div class="col-md-3 font-weight-bold">Commission:</div>
+                <div class="col-md-9">₹{{ settlement_request.total_commission }}</div>
+            </div>
+            <div class="row detail-row">
+                <div class="col-md-3 font-weight-bold">Net Earnings:</div>
+                <div class="col-md-9">₹{{ settlement_request.net_earnings }}</div>
+            </div>
+            <div class="row detail-row">
+                <div class="col-md-3 font-weight-bold">Requested At:</div>
+                <div class="col-md-9">{{ settlement_request.requested_at|date:"Y-m-d H:i" }}</div>
+            </div>
+            <div class="row detail-row">
+                <div class="col-md-3 font-weight-bold">Admin Comment:</div>
+                <div class="col-md-9">{{ settlement_request.admin_comment|default:"No comment" }}</div>
+            </div>
+
+            <div class="mt-4">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#updateModal">
+                    Update Status
+                </button>
+                <a href="{% url 'settlement_requests_list_admin' %}" class="btn btn-secondary ml-2">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for updating settlement request -->
+<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateModalLabel">Update Settlement Request #{{ settlement_request.id }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{% url 'update_settlement_request_admin' settlement_request.id %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select class="form-control" id="status" name="status">
+                            <option value="pending" {% if settlement_request.status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="approved" {% if settlement_request.status == 'approved' %}selected{% endif %}>Approved</option>
+                            <option value="rejected" {% if settlement_request.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin_comment">Admin Comment</label>
+                        <textarea class="form-control" id="admin_comment" name="admin_comment" rows="3">{{ settlement_request.admin_comment }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

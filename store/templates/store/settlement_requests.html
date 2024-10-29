@@ -1,0 +1,107 @@
+{% extends 'store/seller_base.html' %}
+{% block title %}Settlement Requests{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+  <div class="page-header">
+    <h3 class="page-title">Settlement Requests</h3>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Review Settlement Request</h4>
+          {% if selected_orders %}
+            <form method="post">
+              {% csrf_token %}
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Order ID</th>
+                      <th>Date</th>
+                      <th>Total Amount</th>
+                      <th>Commission</th>
+                      <th>Net Earnings</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for order in selected_orders %}
+                    <tr>
+                      <td>#{{ order.id }}</td>
+                      <td>{{ order.created_at|date:"F d, Y H:i" }}</td>
+                      <td>₹{{ order.total_price|floatformat:2 }}</td>
+                      <td>₹{{ order.total_commission|floatformat:2 }}</td>
+                      <td>₹{{ order.net_earnings|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                  <tfoot>
+                    <tr class="font-weight-bold">
+                      <td colspan="2">Totals</td>
+                      <td>₹{{ total_selected_sales|floatformat:2 }}</td>
+                      <td>₹{{ total_selected_commission|floatformat:2 }}</td>
+                      <td>₹{{ total_selected_net_earnings|floatformat:2 }}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+              <input type="hidden" name="order_ids" value="{{ selected_order_ids }}">
+              <button type="submit" class="btn btn-primary mt-3">Submit Settlement Request</button>
+            </form>
+          {% else %}
+            <p class="text-muted">No orders selected for settlement. Please select orders from the seller payments page.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-lg-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Settlement Request History</h4>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Total Sales</th>
+                  <th>Total Commission</th>
+                  <th>Net Earnings</th>
+                  <th>Requested At</th>
+                  <th>Status</th>
+                  <th>Admin Comment</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for request in settlement_requests %}
+                <tr>
+                  <td>{{ request.id }}</td>
+                  <td>₹{{ request.total_sales|floatformat:2 }}</td>
+                  <td>₹{{ request.total_commission|floatformat:2 }}</td>
+                  <td>₹{{ request.net_earnings|floatformat:2 }}</td>
+                  <td>{{ request.requested_at|date:"F d, Y H:i" }}</td>
+                  <td>
+                    <span class="badge badge-{% if request.status == 'approved' %}success{% elif request.status == 'rejected' %}danger{% else %}warning{% endif %}">
+                      {{ request.status|title }}
+                    </span>
+                  </td>
+                  <td>{{ request.admin_comment|default:"N/A" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="7" class="text-center">No settlement requests found.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

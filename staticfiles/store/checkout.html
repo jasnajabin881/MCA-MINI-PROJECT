@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Complete Your Payment</h2>
+<p>Total Amount: {{ amount_in_rupees }} {{ currency }}</p>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if not has_shipping_address %}
+    <h3>Shipping Information</h3>
+    <form method="post" action="{% url 'initiate_payment' %}">
+        {% csrf_token %}
+        {{ shipping_form.as_p }}
+        <button type="submit">Save Shipping Information</button>
+    </form>
+{% elif shipping_info_just_saved %}
+    <p>Your shipping information has been saved. You can now proceed with the payment.</p>
+    <a href="{% url 'initiate_payment' %}" class="btn btn-primary">Proceed to Payment</a>
+{% else %}
+    <button id="rzp-button1">Pay Now</button>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+    var options = {
+        "key": "{{ razorpay_key }}",
+        "amount": "{{ amount }}",
+        "currency": "{{ currency }}",
+        "name": "Your Store Name",
+        "description": "Order Payment",
+        "order_id": "{{ razorpay_order_id }}",
+        "handler": function (response){
+            document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+            document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+            document.getElementById('razorpay_signature').value = response.razorpay_signature;
+            document.getElementById('razorpay-form').submit();
+        },
+        "prefill": {
+            "name": "{{ user_name }}",
+            "email": "{{ user_email }}",
+            "contact": "{{ user_contact|default:'' }}"
+        },
+        "theme": {
+            "color": "#F37254"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    document.getElementById('rzp-button1').onclick = function(e){
+        rzp1.open();
+        e.preventDefault();
+    }
+    </script>
+
+    <form action="{{ callback_url }}" method="POST" id="razorpay-form">
+        {% csrf_token %}
+        <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+        <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+        <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+    </form>
+{% endif %}
+{% endblock %}
